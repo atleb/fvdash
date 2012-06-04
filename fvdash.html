@@ -1,0 +1,271 @@
+
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="user-scalable=no, width=device-width">
+
+<title>FV Dash</title>
+<link href="css/fvdash-0.1.css" type="text/css" rel="stylesheet">
+
+ <script src="https://www.google.com/jsapi"></script>
+
+  <script src="js/gadash-1.0.js"></script>
+  <script src="js/fvdash-0.1.js"></script>  
+
+  <script src="https://apis.google.com/js/client.js?onload=gadashInit"></script>
+
+
+<style>
+	#gauge1 { width: 400px; height: 400px;}
+
+.infoText {
+position: absolute;	top: 100px;	left: 100px;
+width: 80%; height: 50%
+background: lightGrey; border: 3px solid;	padding: 30px;
+display: none;
+}
+.infoText p { margin: 10px 0; }
+
+</style>
+
+</head>
+<body>
+
+<div class="admin">
+<div><img src="fvn-logo-neg_1px-shadow.png"></div>
+<span>Velg profil: </span>
+<form>
+<select onchange="setProfile(this.value)" id="selectProfile">
+
+   <option value="ga:21700091" selected="">www.fvn.no</option>
+   <option value="ga:59126281">Kultur</option>
+   <option value="ga:60241689">Sport</option>
+   <option value="ga:60242094">Lillesand</option>
+   <option value="ga:60242196">God Helg</option>
+   <option value="ga:60244188">Nyheter</option>
+   <option value="ga:60244189">Kristiansand</option>
+   <option value="ga:60244574">Folk</option>
+   <option value="ga:60245699">Motor</option>
+   <option value="ga:60246483">Søgne</option>
+   <option value="ga:60246687">Vennesla</option>
+   <option value="ga:60248185">Økonomi</option>
+   <option value="ga:60248487">Mandal</option>
+   <option value="ga:60262004">Setesdal</option>
+   <option value="ga:60262218">Video</option>
+   <option value="ga:60262416">Mobil</option>
+   <option value="ga:60262722">Nært</option>
+   <option value="ga:60262814">Mitt abonnement</option>
+   <option value="ga:60262906">Web</option>
+   <option value="ga:60263401">Fotball</option>
+   <option value="ga:60263703">Mening</option>
+   <option value="ga:60264202">Bolig</option>
+   <option value="ga:60265300">Kundesenter</option>
+</select>
+</form>
+
+	<button id="chart-button" onclick="drawTodayCharts();">tegn i dag</button>
+	<button id="chart-button" onclick="drawYesterdayCharts();">tegn i går</button> 
+	<button id="chart-button" onclick="fvdash.util.resetAuth();">oppfrisk innlogg</button>
+	<button id="info-button" onclick="$(&#39;.infoText&#39;).toggle();">?!?</button>
+	<button id="authorize-button" style="visibility: hidden; ">Sett i gang med Analytics</button>
+</div>
+
+<div class="row">
+ <div id="chart1"></div>  
+ <div id="chart2"></div>
+ <div id="gauge1"></div>
+ 
+</div>
+
+<div class="row">
+<p>Totalt lest så langt: <span id="totalPages"></span> (unike sidevisninger)</p>
+	  <div id="table1"></div> 
+</div>
+
+
+
+<div class="infoText">
+<p>Besøkende er et parameter for antall lesere. <br>
+ Blir også kalt unike brukere.
+ Teknisk telles antall unike informasjonskapsler/cookies som har besøkt nettstedet. 
+ </p>
+<p>Unike sidevisninger er et parameter for lesing. <br>
+Teknisk telles antall unike nedlastinger av enkeltsider i en brukersesjon.
+ Det vil si at en bruker som er inne på samme side flere ganger, kun blir talt som en unik sidevisning.
+ </p>
+<p>Grafen besøkende, <br>
+ pr time viser hvor mange besøkende som har besøkt den valgte profilen per time, 
+sammenliknet med samme dag i forrige uke. <br>
+Grafen viser utviklingen til nå i dag og gårsdagens utvikling, basert på valget i menyen.
+</p>
+<p>Grafen unike sidevisninger, <br>
+ totalt viser hvor mange unike sider som har blitt lastet ned på den valgte profilen hver time,
+  sammenliknet med samme dag forrige uke. <br>
+  Grafen viser utviklingen til nå i dag eller gårsdagens utvikling,<br>
+ basert på valget som er gjort i toppmenyen.</p>
+<p>Tabellen mest lest viser hvilke artikler som har flest unike sidevisninger til nå i dag eller i går, <br>
+basert på valget som er gjort i toppmenyen. <br>
+Tabellen ekskluderer forsiden og seksjonsforsider.
+</p>
+<p>Fra venstre står artikkelens tittel, antall unike sidevisninger artikkelen har hatt, 
+ hvorvidt artikkelen ligger åpent utenfor abonnementsområdet eller ikke, og hva slags seksjon artikkelen tilhører.
+</p>
+<h4>Alle parametere beskriver trafikkutviklingen på PC/Mac og mobile enheter samlet.</h4>
+</div>
+
+  <script>
+  
+    // Configuration basic app
+    var API_KEY = 'AIzaSyBmrnwCC2I2fI7kk_PpP4SDtego_JtXay0';
+    var CLIENT_ID = '430863924509.apps.googleusercontent.com';
+    var TABLE_ID = 'ga:21700091';
+    gadash.configKeys({'apiKey': API_KEY, 'clientId': CLIENT_ID });
+
+var queryConfig = {};
+var queryDayComp = {};
+var queryMostRead ={};
+var queryBounce ={};
+
+var chartOptTable = {};
+var chartOptDayComp = {};
+var chartDayComp = "";
+
+var tableMostRead = "";
+var dTable = "";
+
+var dataTableT ="";
+var dataViewT = "";
+var dataTableC ="";
+var dataView1 = "";
+var dataView2 = "";
+var dataViewJoin = "";
+var dataTableG = "";
+var gaugeC = "";
+
+var dChart1 = "";
+var dChart2 = "";
+var dChart3 = "";
+
+
+var numDays = 0;
+var notToday = 8;
+var dayLength = 23;
+
+
+function setProfile(newProfile){
+	 TABLE_ID = newProfile;
+}
+
+function drawYesterdayCharts(){
+	chartDayComp.set({'last-n-days': '8'});
+	tStart = gadash.util.lastNdays(1);
+	tableMostRead.set({'query':{'start-date': tStart, 'end-date': tStart}});
+	drawCharts();
+}
+
+
+function drawTodayCharts(){
+	chartDayComp.set({'last-n-days': '7'});
+	tStart = gadash.util.lastNdays(0);
+	tableMostRead.set({'query':{'start-date': tStart, 'end-date': tStart}});
+	drawCharts();
+}
+
+function drawCharts(){
+	chartDayComp.set({'query':{'ids': TABLE_ID}}).render();
+	tableMostRead.set({'query':{'ids': TABLE_ID}}).render();
+}
+  	 // Note: Each of these methods return an instance to the chart object.
+	 // This allows you to chain methods. For example: myChart.set(conig1).set(config2).render() 
+  
+
+  
+
+
+function drawBounceGouge(response) {
+ 
+ dataTableG = gadash.util.getDataTable(response, this.config.type);
+
+  gaugeC = new google.visualization.Gauge(document.getElementById('gauge1'));
+  gauge.draw(dataTableG,  this.config.chartOptions);
+
+}
+
+
+chartOptBounce = {
+	 min: 40, max: 55, 
+	 greenFrom: 40, greenTo: 42, greenColor: "#B9C727",
+	 yellowFrom: 45, yellowTo: 50, yellowColor: "#F85707",
+    redFrom: 50, redTo: 55, redColor: "#CC2028"
+	 };
+
+
+	queryBounce = {
+        'metrics': ',ga:entranceBounceRate',
+        'dimensions': 'ga:day',
+			  'max-results': 10
+      };
+
+    gaugeBounce = new gadash.Chart({
+      'type': 'Pie',
+      'divContainer': 'gauge1',
+  	  'last-n-days': '0',
+	   'query': queryBounce,
+      'chartOptions': chartOptBounce,
+ 		'onSuccess': drawBounceGouge
+    });
+
+/*
+*
+*
+*
+*/
+	queryMostRead = {
+        'metrics': 'ga:uniquepageviews',
+        'dimensions': 'ga:pageTitle,ga:pagePath',
+		  'sort': '-ga:uniquePageviews',
+		  'filters': 'ga:pagePath=@html,ga:pagePath=@ece;ga:pagePath!~pre=true',
+		  'max-results': 30
+      };
+
+    tableMostRead = new gadash.Chart({
+      'type': 'Table',
+      'divContainer': 'table1',
+      'columnLabels': ['Artikkel', 'Unike sider'],
+      'query': queryMostRead,
+      'chartOptions': chartOptTable,
+ 		'onSuccess': fvdash.drawMostReadTable
+		});
+
+/*
+*
+*
+*
+*/	
+	queryDayComp = {
+        'metrics': 'ga:visitors,ga:pageviews,ga:uniquePageviews',
+        'dimensions': 'ga:date,ga:hour',
+		  'max-results': 216
+      };
+		
+	chartOptDayComp =  {
+        hAxis: {title:'Klokken',  titleTextStyle: {color: '#009FDA'}, textStyle:  {color: 'grey',  fontSize: 11}},
+        vAxis: {title:'Antall', titleTextStyle: {color: '#009FDA'}, viewWindowMode: 'maximized'},
+		  colors: ['#c7cfc7', '#009FDA'],
+		  legend: { position: 'bottom', textStyle: {color: 'grey', fontSize: 11}},
+        curveType: 'none'
+      };
+		
+    chartDayComp = new gadash.Chart({
+      'chartType': 'LineChart',
+      'chartContainer': ['chart1', 'chart2'],
+      'chartTitles': ['Besøkende, pr time', 'Unike sidevisninger, totalt'],
+      'columnLabels': ['klokken', 'samme dag, forrige uke', 'valgt dag'],
+      'last-n-days': '7',
+      'query': queryDayComp,
+      'chartOptions': chartOptDayComp,
+		'onSuccess': fvdash.drawDayCompCharts
+    });
+	  
+  </script>
+  
+ <script type="text/javascript" src="http://static.fvn.no/javascript/lib/jquery-1.7.1.min.js"></script>  
