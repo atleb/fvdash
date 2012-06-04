@@ -1,0 +1,22 @@
+#table1, #info, #chart1, #chart2 {  }
+
+#chart1, #chart2 { height: 300px;  width: 100%; }
+
+
+
+#table1 {width: 100%; height: 600px; }
+
+.row { float: left; margin: 5px 10px; width: 45%}
+
+.admin { width: 100%;  height: 50px; background: #222;
+background-image: -moz-linear-gradient(top,rgba(0, 0, 0, 1),transparent 4%);
+background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0,rgba(0, 0, 0, 1)),color-stop(0.04,transparent));
+background-image: -webkit-linear-gradient(top,rgba(0, 0, 0, 1),transparent 4%);
+background-image: -o-linear-gradient(top,rgba(0, 0, 0, 1),transparent 4%);
+background-image: linear-gradient(top,rgba(0, 0, 0, 1),transparent 4%);
+color: white;line-height: 1.3;text-shadow: 0 -1px black; }
+
+
+.admin div { float: left; margin: 2px 16px; }
+.admin span, .admin select, .admin button { float: left; margin: 8px 5px; }
+.admin button { background: none; border: 1px solid white; float: left; color:  white; font-size: 20px; }
