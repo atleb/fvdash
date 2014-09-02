@@ -1,1 +1,4 @@
 simple git testing for potential shared code from the fvdash experimentation, including the php api samples
+
+the underlying ez dash code has been superseeded by the embed api
+see samples at https://github.com/googleanalytics/embed-api-demos
